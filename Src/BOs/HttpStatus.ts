@@ -1,0 +1,7 @@
+export enum HttpStatus {
+  SUCCESS,
+  FAILED,
+  UNAUTHORIZED,
+  NOTFOUND,
+  SERVERRROR
+}

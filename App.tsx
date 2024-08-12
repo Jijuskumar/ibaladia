@@ -1,17 +1,16 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Text, View} from 'react-native';
+import RootNavigation from './Src/Navigations/RootNavigation';
+import {NavigationContainer} from '@react-navigation/native';
+import DeviceInfo from 'react-native-device-info';
+import Toast from 'react-native-toast-message';
 
 const App = () => {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-      }}>
-      <Text style={{color: '#000', fontSize: 24}}>Home Page</Text>
-    </View>
+    <NavigationContainer>
+      <RootNavigation />
+      <Toast />
+    </NavigationContainer>
   );
 };
 
