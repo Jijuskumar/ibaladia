@@ -5,6 +5,7 @@ import LoginPage from '../Pages/LoginPage';
 import SplashPage from '../Pages/SplashPage';
 import ListPage from '../Pages/ListPage';
 import TaskPage from '../Pages/TaskPage';
+import DraswerStack from './DraswerStack';
 
 const RootNavigation = () => {
   const Stack = createNativeStackNavigator();
@@ -16,7 +17,7 @@ const RootNavigation = () => {
       }}>
       <Stack.Screen name="Splash" component={SplashPage} />
       <Stack.Screen name="Login" component={LoginPage} />
-      <Stack.Screen name="Home" component={ListPage} />
+      <Stack.Screen name="Home" component={DraswerStack} />
       <Stack.Screen name="InterNetError" component={InternetErrorPage} />
       <Stack.Screen name="WentWrong" component={TaskPage} />
     </Stack.Navigator>

@@ -3,6 +3,7 @@ import {LoginUserBO} from '../BOs/LoginUserBO';
 import DeviceInfo from 'react-native-device-info';
 import base64 from 'base-64';
 import {HttpStatus} from '../BOs/HttpStatus';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const httpClinet = axios.create({
   baseURL: 'http://mobile.baladia.gov.kw:8181/',
@@ -44,6 +45,36 @@ export const loginUser = async (creds: LoginUserBO) => {
 
     return handleResponse(response);
   } catch (error) {
+    return handleError(error as AxiosError);
+  }
+};
+
+export const getTaskList = async () => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    if (accessToken) {
+      const response = await httpClinet.post(
+        'KM_MOBILE_SERVICE/shop-aedev-license/tasks',
+        undefined,
+        {
+          headers: {
+            kmmv: '2023.3.1',
+            authorization: 'Basic ' + accessToken,
+          },
+        },
+      );
+
+      return handleResponse(response);
+    } else {
+      const httpResponse = {
+        status: HttpStatus.UNAUTHORIZED,
+        data: undefined,
+      };
+
+      return httpResponse;
+    }
+  } catch (error) {
+    console.log(error);
     return handleError(error as AxiosError);
   }
 };
