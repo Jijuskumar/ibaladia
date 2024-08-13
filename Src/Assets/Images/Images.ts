@@ -4,4 +4,7 @@ export const LocalImages = {
   home: require('./home.png'),
   logout: require('./logout.png'),
   emptylist: require('./checklist.png'),
+  camera: require('./camera.png'),
+  view: require('./eye.png'),
+  delete: require('./delete.png'),
 };

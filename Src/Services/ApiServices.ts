@@ -79,6 +79,93 @@ export const getTaskList = async () => {
   }
 };
 
+export const getAllDocuments = async (requestId: string, type: number) => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    if (accessToken) {
+      const response = await httpClinet.get(
+        `KM_MOBILE_SERVICE/shop-aedev-license/attachments/${requestId}?document_type_id=${type}`,
+        {
+          headers: {
+            kmmv: '2023.3.1',
+            authorization: 'Basic ' + accessToken,
+          },
+        },
+      );
+
+      return handleResponse(response);
+    } else {
+      const httpResponse = {
+        status: HttpStatus.UNAUTHORIZED,
+        data: undefined,
+      };
+
+      return httpResponse;
+    }
+  } catch (error) {
+    console.log(error);
+    return handleError(error as AxiosError);
+  }
+};
+
+export const getRequestById = async (id: string) => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    if (accessToken) {
+      const response = await httpClinet.get(
+        `KM_MOBILE_SERVICE/shop-aedev-license/request/${id}`,
+        {
+          headers: {
+            kmmv: '2023.3.1',
+            authorization: 'Basic ' + accessToken,
+          },
+        },
+      );
+
+      return handleResponse(response);
+    } else {
+      const httpResponse = {
+        status: HttpStatus.UNAUTHORIZED,
+        data: undefined,
+      };
+
+      return httpResponse;
+    }
+  } catch (error) {
+    console.log(error);
+    return handleError(error as AxiosError);
+  }
+};
+
+export const getDetailsById = async (id: string) => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    if (accessToken) {
+      const response = await httpClinet.get(
+        `KM_MOBILE_SERVICE/shop-aedev-license/details/${id}`,
+        {
+          headers: {
+            kmmv: '2023.3.1',
+            authorization: 'Basic ' + accessToken,
+          },
+        },
+      );
+
+      return handleResponse(response);
+    } else {
+      const httpResponse = {
+        status: HttpStatus.UNAUTHORIZED,
+        data: undefined,
+      };
+
+      return httpResponse;
+    }
+  } catch (error) {
+    console.log(error);
+    return handleError(error as AxiosError);
+  }
+};
+
 const handleResponse = (response: AxiosResponse) => {
   const httpResponse = {
     status: HttpStatus.FAILED,
