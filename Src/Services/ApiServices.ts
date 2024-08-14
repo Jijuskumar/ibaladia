@@ -4,6 +4,9 @@ import DeviceInfo from 'react-native-device-info';
 import base64 from 'base-64';
 import {HttpStatus} from '../BOs/HttpStatus';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Asset} from 'react-native-image-picker';
+import {EntryBO} from '../BOs/TaskResponse';
+import {CompleteRequestBO} from '../BOs/CompleteRequestBodyBO';
 
 const httpClinet = axios.create({
   baseURL: 'http://mobile.baladia.gov.kw:8181/',
@@ -143,6 +146,118 @@ export const getDetailsById = async (id: string) => {
     if (accessToken) {
       const response = await httpClinet.get(
         `KM_MOBILE_SERVICE/shop-aedev-license/details/${id}`,
+        {
+          headers: {
+            kmmv: '2023.3.1',
+            authorization: 'Basic ' + accessToken,
+          },
+        },
+      );
+
+      return handleResponse(response);
+    } else {
+      const httpResponse = {
+        status: HttpStatus.UNAUTHORIZED,
+        data: undefined,
+      };
+
+      return httpResponse;
+    }
+  } catch (error) {
+    console.log(error);
+    return handleError(error as AxiosError);
+  }
+};
+
+export const uploadAttachment = async (
+  image: Asset,
+  item: EntryBO,
+  folderId: string,
+) => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    if (accessToken) {
+      const formData = new FormData();
+      formData.append('file', {
+        uri: image.uri,
+        name: image.fileName || 'photo.jpg',
+        type: image.type,
+      });
+      formData.append(
+        'request_id',
+        item.content.properties.packagesadvertisement_requerequest_number,
+      );
+      formData.append(
+        'request_number',
+        item.content.properties.packagesadvertisement_requeid,
+      );
+      formData.append('document_type_code', 1);
+      formData.append('document_type', 'طلب خطى من الجهة الطالبة الترخيص');
+      formData.append('folderId', folderId);
+
+      const response = await httpClinet.post(
+        'KM_MOBILE_SERVICE/shop-aedev-license/attachment/upload',
+        formData,
+        {
+          headers: {
+            kmmv: '2023.3.1',
+            authorization: 'Basic ' + accessToken,
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+
+      return handleResponse(response);
+    } else {
+      const httpResponse = {
+        status: HttpStatus.UNAUTHORIZED,
+        data: undefined,
+      };
+
+      return httpResponse;
+    }
+  } catch (error) {
+    console.log(error);
+    return handleError(error as AxiosError);
+  }
+};
+
+export const deleteAttachmentUsingId = async (id: string) => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    if (accessToken) {
+      const response = await httpClinet.delete(
+        `KM_MOBILE_SERVICE/shop-aedev-license/attachment/delete?id=${id}`,
+        {
+          headers: {
+            kmmv: '2023.3.1',
+            authorization: 'Basic ' + accessToken,
+          },
+        },
+      );
+
+      return handleResponse(response);
+    } else {
+      const httpResponse = {
+        status: HttpStatus.UNAUTHORIZED,
+        data: undefined,
+      };
+
+      return httpResponse;
+    }
+  } catch (error) {
+    console.log(error);
+    return handleError(error as AxiosError);
+  }
+};
+
+export const updateTaskasCompleted = async (body: CompleteRequestBO) => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    if (accessToken) {
+      const response = await httpClinet.post(
+        'KM_MOBILE_SERVICE/app/task/complete',
+        body,
         {
           headers: {
             kmmv: '2023.3.1',

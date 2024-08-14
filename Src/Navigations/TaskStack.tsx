@@ -1,6 +1,6 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import ListPage from '../Pages/ListPage';
+import ListPage from '../Pages/DetailsPage/ListPage';
 import TaskPage from '../Pages/TaskPage';
 
 const TaskStack = () => {

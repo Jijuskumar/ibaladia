@@ -108,81 +108,76 @@ const TaskPage: FC<ScreenProps> = props => {
                   <Text style={style.text}>
                     التاريخ:{' '}
                     <Text style={[style.textbold, {color: '#34A853'}]}>
-                      {item.content.properties.packagesadvertisement_requerequest_date
-                        .split('T')[0]
-                        .split('-')
-                        .reverse()
-                        .join('-')}
+                      {item.content.properties
+                        .packagesadvertisement_requerequest_date !== undefined
+                        ? item.content.properties.packagesadvertisement_requerequest_date
+                            .split('T')[0]
+                            .split('-')
+                            .reverse()
+                            .join('-')
+                        : '-'}
                     </Text>
                   </Text>
                   <Text style={style.text}>
                     رقم الطلب:{' '}
                     <Text style={[style.textbold]}>
-                      {
-                        item.content.properties
-                          .packagesadvertisement_requerequest_number
-                      }
+                      {item.content.properties
+                        .packagesadvertisement_requerequest_number ?? '-'}
                     </Text>
                   </Text>
                   <Text style={style.text}>
                     نوع الطلب:{' '}
                     <Text>
-                      {
-                        item.content.properties
-                          .packagesadvertisement_requeactivity_type_name
-                      }
+                      {item.content.properties
+                        .packagesadvertisement_requeactivity_type_name ?? '-'}
                     </Text>
                   </Text>
                   <Text style={style.text}>
                     المنطقة:{' '}
                     <Text>
-                      {
-                        item.content.properties
-                          .packagesadvertisement_requeneighbourhood
-                      }
+                      {item.content.properties
+                        .packagesadvertisement_requeneighbourhood ?? '-'}
                     </Text>
                   </Text>
                   <Text style={style.text}>
                     حاجز:{' '}
                     <Text style={style.textbold}>
-                      {item.content.properties.packagesadvertisement_requeblock}
+                      {item.content.properties
+                        .packagesadvertisement_requeblock ?? '-'}
                     </Text>
                   </Text>
                   <Text style={style.text}>
                     قطعة:{' '}
                     <Text style={style.textbold}>
-                      {
-                        item.content.properties
-                          .packagesadvertisement_requeparcel
-                      }
+                      {item.content.properties
+                        .packagesadvertisement_requeparcel ?? '-'}
                     </Text>
                   </Text>
                   <Text style={style.text}>
                     اسم نوع النشاط:{' '}
                     <Text>
-                      {
-                        item.content.properties
-                          .packagesadvertisement_requeactivity_type_name
-                      }
+                      {item.content.properties
+                        .packagesadvertisement_requeactivity_type_name ?? '-'}
                     </Text>
                   </Text>
                   <Text style={style.text}>
                     رقم الرخصة:{' '}
                     <Text style={style.textbold}>
-                      {
-                        item.content.properties
-                          .packagesadvertisement_requelicense_number
-                      }
+                      {item.content.properties
+                        .packagesadvertisement_requelicense_number ?? '-'}
                     </Text>
                   </Text>
                   <Text style={style.text}>
                     تاريخ الترخيص:{' '}
                     <Text style={style.textbold}>
-                      {item.content.properties.packagesadvertisement_requelicense_date
-                        .split('T')[0]
-                        .split('-')
-                        .reverse()
-                        .join('-')}
+                      {item.content.properties
+                        .packagesadvertisement_requelicense_date
+                        ? item.content.properties.packagesadvertisement_requelicense_date
+                            .split('T')[0]
+                            .split('-')
+                            .reverse()
+                            .join('-')
+                        : '-'}
                     </Text>
                   </Text>
                 </TouchableOpacity>
@@ -203,6 +198,7 @@ const style = StyleSheet.create({
     height: height,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#fff',
   },
   text: {
     color: '#000',

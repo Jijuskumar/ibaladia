@@ -21,6 +21,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import TaskStack from './TaskStack';
 import {useSelector} from 'react-redux';
 import {RootState} from '../Redux/Store';
+import {getConvertedName} from '../Helper/Conversions';
+
 interface MenuItemProps {
   image: ImageSourcePropType;
   text: string;
@@ -45,34 +47,47 @@ const CustomDrawerContent: FC<DrawerContentComponentProps> = ({navigation}) => {
 
   return (
     <View style={style.drawer}>
-      <View style={style.drawerContainer}>
-        <View>
-          <Text style={{fontSize: getWidth(16), color: '#000'}}>
-            {user.name}
-          </Text>
-          <Text style={{fontSize: getWidth(15), color: '#000'}}>
-            {user.label}
-          </Text>
+      <View style={{flex: 1}}>
+        <View style={style.drawerContainer}>
+          <View>
+            <Text style={{fontSize: getWidth(16), color: '#000'}}>
+              {user.name}
+            </Text>
+            <Text style={{fontSize: getWidth(15), color: '#000'}}>
+              {user.label}
+            </Text>
+          </View>
+          <View style={{marginLeft: getWidth(15)}}>
+            <Image
+              source={LocalImages.account}
+              style={{width: getWidth(18), height: getHeight(18)}}
+            />
+          </View>
         </View>
-        <View style={{marginLeft: getWidth(15)}}>
-          <Image
-            source={LocalImages.account}
-            style={{width: getWidth(18), height: getHeight(18)}}
-          />
-        </View>
+        <MenuItem
+          text="قائمة الخدمات"
+          image={LocalImages.home}
+          onPress={() => {
+            navigation.navigate('Task', {screen: 'TaskList'});
+          }}
+        />
+        <MenuItem
+          text="تسجيل الخروج"
+          image={LocalImages.logout}
+          onPress={logout}
+        />
       </View>
-      <MenuItem
-        text="قائمة الخدمات"
-        image={LocalImages.home}
-        onPress={() => {
-          navigation.navigate('Task', {screen: 'TaskList'});
-        }}
-      />
-      <MenuItem
-        text="تسجيل الخروج"
-        image={LocalImages.logout}
-        onPress={logout}
-      />
+      <View
+        style={{
+          height: 30,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: '#d3d3d35a',
+          borderTopColor: '#d3d3d3',
+          borderTopWidth: 1,
+        }}>
+        <Text style={style.versionText}>V2023.3.1</Text>
+      </View>
     </View>
   );
 };
@@ -83,6 +98,7 @@ const MenuItem: FC<MenuItemProps> = props => {
       <Text
         style={{
           color: '#000',
+          fontFamily: 'NotoSans-Regular, NotoSansArabic-Medium',
         }}>
         {props.text}
       </Text>
@@ -116,7 +132,9 @@ const DraswerStack = () => {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <Text style={style.headerText}>{props.route.name}</Text>
+                <Text style={style.headerText}>
+                  {getConvertedName(props.route.name)}
+                </Text>
               </View>
               <TouchableOpacity
                 activeOpacity={1}
@@ -190,9 +208,14 @@ const style = StyleSheet.create({
   },
   headerText: {
     color: '#000',
-    fontSize: getHeight(18),
+    fontSize: getHeight(20),
     fontWeight: '600',
     marginLeft: getWidth(50),
+  },
+  versionText: {
+    color: '#000',
+    fontSize: 12,
+    fontWeight: '500',
   },
 });
 
