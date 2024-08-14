@@ -97,10 +97,18 @@ const RequestInfoComponent: FC<RequestInfoComponentProps> = ({request}) => {
           />
           <InfoDividerComponent
             primaryText={`تاريخ الإصدار : ${
-              request?.issue_date.split('T')[0] ?? '-'
+              request?.issue_date
+                .split('T')[0]
+                .split('-')
+                .reverse()
+                .join('-') ?? '-'
             }`}
             secondaryText={`تاريخ الانتهاء : ${
-              request?.expiry_date.split('T')[0] ?? '-'
+              request?.expiry_date
+                .split('T')[0]
+                .split('-')
+                .reverse()
+                .join('-') ?? '-'
             }`}
           />
           <InfoDividerComponent

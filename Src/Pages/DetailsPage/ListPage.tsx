@@ -368,7 +368,11 @@ const TaskDetailsPage: FC<ScreenProps> = props => {
                 <Text style={style.text}>
                   بدأ في :{' '}
                   <Text style={style.text}>
-                    {request?.r_creation_date.split('T')[0]}
+                    {request?.r_creation_date
+                      .split('T')[0]
+                      .split('-')
+                      .reverse()
+                      .join('-')}
                   </Text>
                 </Text>
               </View>
