@@ -31,6 +31,8 @@ export const style = StyleSheet.create({
     borderRadius: 5,
     marginHorizontal: 10,
     marginVertical: 5,
+    color: '#000',
+    textAlign: 'right',
   },
   uploadWrapper: {
     marginHorizontal: getWidth(10),

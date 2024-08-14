@@ -242,10 +242,11 @@ const TaskDetailsPage: FC<ScreenProps> = props => {
 
       if (response.status === HttpStatus.SUCCESS) {
         Toast.show({
-          text1: 'Document uploaded successfully',
+          text1: 'Task uploaded successfully',
           type: 'success',
           position: 'top',
         });
+        setComments('');
       } else {
         Toast.show({
           text1: 'Somthing went wrong please try after',
@@ -275,15 +276,26 @@ const TaskDetailsPage: FC<ScreenProps> = props => {
           } else if (response.assets && response.assets.length > 0) {
             const image = response.assets[0];
             // console.log(image.uri);
-            // const base64String = await RNFS.readFile(ima
-
-            // console.log('byteArray', byteArray);
-
-            const resposne = await uploadAttachment(
+            const apiResposne = await uploadAttachment(
               image,
               props.route.params,
               request?.i_folder_id[0] || '',
             );
+
+            if (apiResposne.status === HttpStatus.SUCCESS) {
+              getUploadedDocuments();
+              Toast.show({
+                text1: 'Document uploaded successfully',
+                type: 'success',
+                position: 'top',
+              });
+            } else {
+              Toast.show({
+                text1: 'Somthing went wrong please try after',
+                type: 'error',
+                position: 'top',
+              });
+            }
           }
         });
       } else {
