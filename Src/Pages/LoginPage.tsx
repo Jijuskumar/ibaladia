@@ -20,6 +20,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import base64 from 'base-64';
 import Toast from 'react-native-toast-message';
 import {ScreenProps} from '../BOs/ScreenProps';
+import {useDispatch} from 'react-redux';
+import {updateUser} from '../Redux/Reducers/userReducer';
 
 const LoginPage: FC<ScreenProps> = props => {
   const isRTL = I18nManager.isRTL;
@@ -30,6 +32,7 @@ const LoginPage: FC<ScreenProps> = props => {
   const [usernameErr, setUsernameErr] = useState<boolean>(false);
   const [passwordErr, SetPasswordErr] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const dispatch = useDispatch();
 
   const onChangeText = (text: string, name: 'username' | 'password') => {
     const clonedLoginCreds = {...loginCreds};
@@ -53,6 +56,13 @@ const LoginPage: FC<ScreenProps> = props => {
             loginCreds.username.trim() + ':' + loginCreds.password.trim();
           const accessToken = base64.encode(originalString);
           await AsyncStorage.setItem('accessToken', accessToken);
+          if (response.data) {
+            dispatch(updateUser(response.data));
+            await AsyncStorage.setItem(
+              'account',
+              JSON.stringify(response.data),
+            );
+          }
           Toast.show({
             text1: 'Successfully logined',
             type: 'success',

@@ -1,5 +1,6 @@
 import {
   createDrawerNavigator,
+  DrawerContentComponentProps,
   DrawerHeaderProps,
   useDrawerStatus,
 } from '@react-navigation/drawer';
@@ -14,31 +15,44 @@ import {
 } from 'react-native';
 import {getHeight, getWidth} from '../Helper/DimensionsHelper';
 import LinearGradient from 'react-native-linear-gradient';
-import ListPage from '../Pages/ListPage';
 import InternetErrorPage from '../Pages/InternetErrorPage';
 import {LocalImages} from '../Assets/Images/Images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import TaskPage from '../Pages/TaskPage';
 import TaskStack from './TaskStack';
-
+import {useSelector} from 'react-redux';
+import {RootState} from '../Redux/Store';
 interface MenuItemProps {
   image: ImageSourcePropType;
   text: string;
   onPress: () => void;
 }
 
-const CustomDrawerContent = ({navigation, route}: any) => {
+interface DrawerContentProps {
+  navigation: DrawerContentComponentProps;
+  route: any;
+}
+
+const CustomDrawerContent: FC<DrawerContentComponentProps> = ({navigation}) => {
+  const user = useSelector((state: RootState) => state.user.value);
+
   const logout = async () => {
     await AsyncStorage.clear();
-    navigation.replace('Login');
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'Login'}],
+    });
   };
 
   return (
     <View style={style.drawer}>
       <View style={style.drawerContainer}>
         <View>
-          <Text style={{fontSize: getWidth(16), color: '#000'}}>shopinsp</Text>
-          <Text style={{fontSize: getWidth(15), color: '#000'}}>shopinsp</Text>
+          <Text style={{fontSize: getWidth(16), color: '#000'}}>
+            {user.name}
+          </Text>
+          <Text style={{fontSize: getWidth(15), color: '#000'}}>
+            {user.label}
+          </Text>
         </View>
         <View style={{marginLeft: getWidth(15)}}>
           <Image
@@ -51,7 +65,7 @@ const CustomDrawerContent = ({navigation, route}: any) => {
         text="قائمة الخدمات"
         image={LocalImages.home}
         onPress={() => {
-          navigation.navigate('Home');
+          navigation.navigate('Task', {screen: 'TaskList'});
         }}
       />
       <MenuItem

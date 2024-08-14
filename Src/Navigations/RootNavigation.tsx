@@ -1,14 +1,27 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React from 'react';
+import React, {useEffect} from 'react';
 import InternetErrorPage from '../Pages/InternetErrorPage';
 import LoginPage from '../Pages/LoginPage';
 import SplashPage from '../Pages/SplashPage';
-import ListPage from '../Pages/ListPage';
 import TaskPage from '../Pages/TaskPage';
 import DraswerStack from './DraswerStack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useDispatch} from 'react-redux';
+import {updateUser} from '../Redux/Reducers/userReducer';
 
 const RootNavigation = () => {
   const Stack = createNativeStackNavigator();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const init = async () => {
+      const user = await AsyncStorage.getItem('account');
+      if (user) {
+        dispatch(updateUser(JSON.parse(user)));
+      }
+    };
+    init();
+  }, []);
 
   return (
     <Stack.Navigator

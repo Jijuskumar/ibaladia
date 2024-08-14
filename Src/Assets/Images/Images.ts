@@ -7,4 +7,5 @@ export const LocalImages = {
   camera: require('./camera.png'),
   view: require('./eye.png'),
   delete: require('./delete.png'),
+  attachment: require('./attachment.png'),
 };

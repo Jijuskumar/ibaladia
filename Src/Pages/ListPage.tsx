@@ -7,7 +7,7 @@ import {
   Image,
   TextInput,
 } from 'react-native';
-import {getHeight, getWidth, width} from '../Helper/DimensionsHelper';
+import {getHeight, getWidth, height, width} from '../Helper/DimensionsHelper';
 import {LocalImages} from '../Assets/Images/Images';
 import {DocumentBO} from '../BOs/DocumentBO';
 import {
@@ -23,23 +23,31 @@ import InfoDividerComponent from '../Components/InfoDividerComponent';
 import {RequestDetailsBO} from '../BOs/RequestDetailsBO';
 import {ScreenProps} from '../BOs/ScreenProps';
 import AttachmentListComponent from '../Components/AttachmentListComponent';
+import Loader from '../Components/Loader';
 
-const ListPage: FC<ScreenProps> = props => {
+const TaskDetailsPage: FC<ScreenProps> = props => {
   const [comments, setComments] = useState<string>('');
   const [documents, setDocuments] = useState<DocumentBO[]>([]);
   const [attchments, setAttachments] = useState<DocumentBO[]>([]);
   const [request, setRequest] = useState<RequestDetailsBO>();
   const [details, setDetails] = useState();
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     init();
   }, [props.route.params]);
 
   const init = async () => {
-    await getUploadedDocuments();
-    await getAttachments();
-    await getRequest();
-    await getDetails();
+    setLoading(true);
+    Promise.all([
+      getUploadedDocuments(),
+      getAttachments(),
+      getRequest(),
+      getDetails(),
+    ]);
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
   };
 
   const getAttachments = async () => {
@@ -129,11 +137,6 @@ const ListPage: FC<ScreenProps> = props => {
 
   const getDetails = async () => {
     try {
-      console.log(
-        'getattachments',
-        props.route.params.content.properties
-          .packagesadvertisement_requerequest_number,
-      );
       const response = await getDetailsById(
         props.route.params.content.properties
           .packagesadvertisement_requerequest_number,
@@ -166,305 +169,337 @@ const ListPage: FC<ScreenProps> = props => {
   const updateTask = () => {};
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-      }}>
-      <ScrollView style={{flex: 1}}>
-        <View style={style.content}>
-          <View style={style.contentHeader}>
-            <Text
-              style={[
-                style.text,
-                {
-                  marginRight: getWidth(10),
-                  fontSize: 20,
-                  fontWeight: '600',
-                },
-              ]}>
-              تقرير التفتيش
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: 10,
-              paddingHorizontal: 10,
-            }}>
-            <View style={{flex: 1}}>
-              <Text style={style.text}>
-                الحالة : <Text style={style.text}>غير نشط</Text>
+    <>
+      <View style={style.container}>
+        <ScrollView style={{flex: 1}}>
+          <View style={style.content}>
+            <View style={style.contentHeader}>
+              <Text
+                style={[
+                  style.text,
+                  {
+                    marginRight: getWidth(10),
+                    fontSize: 20,
+                    fontWeight: '600',
+                  },
+                ]}>
+                تقرير التفتيش
               </Text>
             </View>
-            <View style={{flex: 1}}>
-              <Text style={style.text}>
-                بدأ في :{' '}
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginTop: 10,
+                paddingHorizontal: 10,
+              }}>
+              <View style={{flex: 1}}>
                 <Text style={style.text}>
-                  {request?.r_creation_date.split('T')[0]}
+                  الحالة : <Text style={style.text}>غير نشط</Text>
                 </Text>
-              </Text>
+              </View>
+              <View style={{flex: 1}}>
+                <Text style={style.text}>
+                  بدأ في :{' '}
+                  <Text style={style.text}>
+                    {request?.r_creation_date.split('T')[0]}
+                  </Text>
+                </Text>
+              </View>
+              <View style={{flex: 1.25}}>
+                <Text style={style.text}>
+                  مخصص ل : <Text style={style.text}>{request?.inspector}</Text>
+                </Text>
+              </View>
             </View>
-            <View style={{flex: 1.25}}>
-              <Text style={style.text}>
-                مخصص ل : <Text style={style.text}>{request?.inspector}</Text>
-              </Text>
-            </View>
-          </View>
-          <Text style={style.headingText}>تعليقات</Text>
-          <TextInput
-            value={comments}
-            onChangeText={setComments}
-            style={style.input}
-          />
-          <View style={style.uploadWrapper}>
-            <View
-              style={{
-                flexDirection: 'row',
-                marginVertical: 25,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Text style={{fontSize: 20, color: '#000'}}>اضف صورة</Text>
-              <Image
-                source={LocalImages.camera}
+            <Text style={style.headingText}>تعليقات</Text>
+            <TextInput
+              value={comments}
+              onChangeText={setComments}
+              style={style.input}
+            />
+            <View style={style.uploadWrapper}>
+              <View
                 style={{
-                  width: getWidth(20),
-                  height: getHeight(18),
-                  tintColor: '#ce7e00',
-                  marginLeft: 20,
-                }}
-              />
+                  flexDirection: 'row',
+                  marginVertical: 25,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text style={{fontSize: 20, color: '#000'}}>اضف صورة</Text>
+                <Image
+                  source={LocalImages.camera}
+                  style={{
+                    width: getWidth(20),
+                    height: getHeight(18),
+                    tintColor: '#ce7e00',
+                    marginLeft: 20,
+                  }}
+                />
+              </View>
+              <View style={style.documentsContainer}>
+                {documents.map((doc: DocumentBO, index: number) => {
+                  return (
+                    <DocumentListComponent
+                      key={doc.id}
+                      index={index}
+                      doc={doc}
+                      onPreddDelete={onViewDocument}
+                      onPressView={onViewDocument}
+                    />
+                  );
+                })}
+              </View>
             </View>
-            <View style={style.documentsContainer}>
-              {documents.map((doc: DocumentBO, index: number) => {
-                return (
-                  <DocumentListComponent
-                    index={index}
-                    doc={doc}
-                    onPreddDelete={onViewDocument}
-                    onPressView={onViewDocument}
-                  />
-                );
-              })}
-            </View>
+            <TouchableOpacity onPress={updateTask} style={style.submitButton}>
+              <Text style={{color: '#fff', fontSize: 20, fontWeight: '600'}}>
+                ارسال
+              </Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={updateTask} style={style.submitButton}>
-            <Text style={{color: '#fff', fontSize: 20, fontWeight: '600'}}>
-              ارسال
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View style={style.content}>
-          <View style={style.contentHeader}>
-            <Text
-              style={[
-                style.text,
-                {
-                  marginRight: getWidth(10),
-                  fontSize: 20,
-                  fontWeight: '600',
-                },
-              ]}>
-              طلب تفاصيل
-            </Text>
-          </View>
-          <View
-            style={{
-              marginTop: 10,
-              paddingHorizontal: 10,
-            }}>
-            <InfoDividerComponent
-              primaryText={'حالة الطلب : ' + request?.request_number}
-              secondaryText={'رقم الطلب : ' + request?.request_status}
-            />
-            <InfoDividerComponent
-              secondaryText={
-                'تاريخ الطلب : ' +
-                request?.license_date
-                  ?.split('T')[0]
-                  .split('-')
-                  .reverse()
-                  .join('-')
-              }
-              primaryText={'رقم الرخصة :' + request?.license_number}
-            />
-            <InfoDividerComponent
-              primaryText={
-                'تاريخ إصدار الترخيص :' +
-                request?.issue_date
-                  ?.split('T')[0]
-                  .split('-')
-                  .reverse()
-                  .join('-')
-              }
-              secondaryText={
-                'تاريخ انتهاء الترخيص : ' +
-                request?.expiry_date
-                  ?.split('T')[0]
-                  .split('-')
-                  .reverse()
-                  .join('-')
-              }
-            />
-            <InfoDividerComponent
-              secondaryText={'إجمالي الرسوم :' + request?.total_fees}
-            />
-          </View>
-          <View
-            style={[
-              style.uploadWrapper,
-              {backgroundColor: '#fff', borderWidth: 1, borderColor: '#d3d3d3'},
-            ]}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                height: getHeight(50),
-                backgroundColor: '#d3d3d3',
-              }}>
-              <Text style={{fontSize: 20, color: '#000', marginRight: 10}}>
-                بيانات التجارة
+          <View style={style.content}>
+            <View style={style.contentHeader}>
+              <Text
+                style={[
+                  style.text,
+                  {
+                    marginRight: getWidth(10),
+                    fontSize: 20,
+                    fontWeight: '600',
+                  },
+                ]}>
+                طلب تفاصيل
               </Text>
             </View>
-            <View style={{paddingHorizontal: 10}}>
+            <View
+              style={{
+                marginTop: 10,
+                paddingHorizontal: 10,
+              }}>
               <InfoDividerComponent
-                primaryText={'الرقم المدني للشركة :' + request?.shop_civil_id}
-                secondaryText={
-                  'رقم الترخيص التجاري:' + request?.moci_license_numer
-                }
+                primaryText={'حالة الطلب : ' + request?.request_number}
+                secondaryText={'رقم الطلب : ' + request?.request_status}
               />
               <InfoDividerComponent
-                primaryText={'اسم المحل' + request?.shop_name}
-                secondaryText={'اسم نوع النشاط' + request?.activity_type_name}
+                secondaryText={
+                  'تاريخ الطلب : ' +
+                  request?.license_date
+                    ?.split('T')[0]
+                    .split('-')
+                    .reverse()
+                    .join('-')
+                }
+                primaryText={'رقم الرخصة :' + request?.license_number}
               />
               <InfoDividerComponent
                 primaryText={
-                  'تاريخ الإصدار :' + request?.issue_date.split('T')[0]
+                  'تاريخ إصدار الترخيص :' +
+                  request?.issue_date
+                    ?.split('T')[0]
+                    .split('-')
+                    .reverse()
+                    .join('-')
                 }
                 secondaryText={
-                  'تاريخ الانتهاء :' + request?.expiry_date.split('T')[0]
+                  'تاريخ انتهاء الترخيص : ' +
+                  request?.expiry_date
+                    ?.split('T')[0]
+                    .split('-')
+                    .reverse()
+                    .join('-')
                 }
               />
               <InfoDividerComponent
-                secondaryText={'رقم الوحدة :' + request?.paci_number}
+                secondaryText={'إجمالي الرسوم :' + request?.total_fees}
               />
             </View>
-          </View>
-          <View
-            style={[
-              style.uploadWrapper,
-              {
-                backgroundColor: '#fff',
-                borderWidth: 1,
-                borderColor: '#d3d3d3',
-                marginTop: 15,
-              },
-            ]}>
             <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                height: getHeight(50),
-                backgroundColor: '#d3d3d3',
-              }}>
-              <Text style={{fontSize: 20, color: '#000', marginRight: 10}}>
-                عنوان البلدية
+              style={[
+                style.uploadWrapper,
+                {
+                  backgroundColor: '#fff',
+                  borderWidth: 1,
+                  borderColor: '#d3d3d3',
+                },
+              ]}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
+                  alignItems: 'center',
+                  height: getHeight(50),
+                  backgroundColor: '#d3d3d3',
+                }}>
+                <Text style={{fontSize: 20, color: '#000', marginRight: 10}}>
+                  بيانات التجارة
+                </Text>
+              </View>
+              <View style={{paddingHorizontal: 10}}>
+                <InfoDividerComponent
+                  primaryText={'الرقم المدني للشركة :' + request?.shop_civil_id}
+                  secondaryText={
+                    'رقم الترخيص التجاري:' + request?.moci_license_numer
+                  }
+                />
+                <InfoDividerComponent
+                  primaryText={'اسم المحل' + request?.shop_name}
+                  secondaryText={'اسم نوع النشاط' + request?.activity_type_name}
+                />
+                <InfoDividerComponent
+                  primaryText={
+                    'تاريخ الإصدار :' + request?.issue_date.split('T')[0]
+                  }
+                  secondaryText={
+                    'تاريخ الانتهاء :' + request?.expiry_date.split('T')[0]
+                  }
+                />
+                <InfoDividerComponent
+                  secondaryText={'رقم الوحدة :' + request?.paci_number}
+                />
+              </View>
+            </View>
+            <View
+              style={[
+                style.uploadWrapper,
+                {
+                  backgroundColor: '#fff',
+                  borderWidth: 1,
+                  borderColor: '#d3d3d3',
+                  marginTop: 15,
+                },
+              ]}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
+                  alignItems: 'center',
+                  height: getHeight(50),
+                  backgroundColor: '#d3d3d3',
+                }}>
+                <Text style={{fontSize: 20, color: '#000', marginRight: 10}}>
+                  عنوان البلدية
+                </Text>
+              </View>
+              <View style={{paddingHorizontal: 10}}>
+                <InfoDividerComponent
+                  primaryText={'محافظة :' + request?.governorate}
+                  secondaryText={'قطعة :' + request?.block}
+                />
+                <InfoDividerComponent
+                  primaryText={'منطقة :'}
+                  secondaryText={'قسيمة :' + request?.parcel}
+                />
+                <InfoDividerComponent
+                  primaryText={'رقم القسيمة :' + request?.parcel_number}
+                  secondaryText={'نوع الاستعمال :'}
+                />
+                <InfoDividerComponent secondaryText={'الدور :'} />
+                <InfoDividerComponent
+                  primaryText={'رقم الوحدة :'}
+                  secondaryText={`مالك المبنى :' ${
+                    request?.building_owner ?? ''
+                  }`}
+                />
+              </View>
+            </View>
+          </View>
+          <View style={style.content}>
+            <View style={style.contentHeader}>
+              <Text
+                style={[
+                  style.text,
+                  {
+                    marginRight: getWidth(10),
+                    fontSize: 20,
+                    fontWeight: '600',
+                  },
+                ]}>
+                وصف الإعلان
               </Text>
             </View>
-            <View style={{paddingHorizontal: 10}}>
+            <View
+              style={{
+                marginTop: 10,
+                paddingHorizontal: 10,
+              }}>
               <InfoDividerComponent
-                primaryText={'محافظة :' + request?.governorate}
-                secondaryText={'قطعة :' + request?.block}
+                primaryText={'اسم نوع الترخيص'}
+                secondaryText={'سم نوع الإعلان'}
               />
               <InfoDividerComponent
-                primaryText={'منطقة :'}
-                secondaryText={'قسيمة :' + request?.parcel}
+                secondaryText={'موقع الإعلان'}
+                primaryText={'عرض'}
               />
               <InfoDividerComponent
-                primaryText={'رقم القسيمة :' + request?.parcel_number}
-                secondaryText={'نوع الاستعمال :'}
-              />
-              <InfoDividerComponent secondaryText={'الدور :'} />
-              <InfoDividerComponent
-                primaryText={'رقم الوحدة :'}
-                secondaryText={`مالك المبنى :' ${
-                  request?.building_owner ?? ''
-                }`}
+                primaryText={'طول'}
+                secondaryText={'هل يوجد شعار'}
               />
             </View>
           </View>
-        </View>
-        <View style={style.content}>
-          <View style={style.contentHeader}>
-            <Text
-              style={[
-                style.text,
-                {
-                  marginRight: getWidth(10),
-                  fontSize: 20,
-                  fontWeight: '600',
-                },
-              ]}>
-              وصف الإعلان
-            </Text>
+          <View style={[style.content, {marginBottom: 40}]}>
+            <View style={style.contentHeader}>
+              <Text
+                style={[
+                  style.text,
+                  {
+                    marginRight: getWidth(10),
+                    fontSize: 20,
+                    fontWeight: '600',
+                  },
+                ]}>
+                المرفقات
+              </Text>
+            </View>
+            {attchments.length === 0 ? (
+              <View
+                style={{
+                  height: getHeight(200),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={[
+                    style.text,
+                    {fontSize: 24, fontWeight: '600', marginBottom: 10},
+                  ]}>
+                  لا توجد مرفقات
+                </Text>
+                <Image
+                  source={LocalImages.attachment}
+                  style={{width: getWidth(40), height: getHeight(60)}}
+                />
+              </View>
+            ) : (
+              <>
+                {attchments.map((doc: DocumentBO, index: number) => {
+                  return (
+                    <AttachmentListComponent
+                      doc={doc}
+                      index={index}
+                      isLast={index === attchments.length - 1}
+                      onPressView={onViewDocument}
+                      key={doc.id}
+                    />
+                  );
+                })}
+              </>
+            )}
           </View>
-          <View
-            style={{
-              marginTop: 10,
-              paddingHorizontal: 10,
-            }}>
-            <InfoDividerComponent
-              primaryText={'اسم نوع الترخيص'}
-              secondaryText={'سم نوع الإعلان'}
-            />
-            <InfoDividerComponent
-              secondaryText={'موقع الإعلان'}
-              primaryText={'عرض'}
-            />
-            <InfoDividerComponent
-              primaryText={'طول'}
-              secondaryText={'هل يوجد شعار'}
-            />
-          </View>
-        </View>
-        <View style={[style.content, {marginBottom: 40}]}>
-          <View style={style.contentHeader}>
-            <Text
-              style={[
-                style.text,
-                {
-                  marginRight: getWidth(10),
-                  fontSize: 20,
-                  fontWeight: '600',
-                },
-              ]}>
-              المرفقات
-            </Text>
-          </View>
-          {attchments.map((doc: DocumentBO, index: number) => {
-            return (
-              <AttachmentListComponent
-                doc={doc}
-                index={index}
-                isLast={index === attchments.length - 1}
-                onPressView={onViewDocument}
-                key={doc.id}
-              />
-            );
-          })}
-        </View>
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </View>
+      <Loader visible={loading} />
+    </>
   );
 };
 
 const style = StyleSheet.create({
+  container: {
+    width: width,
+    height: height,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
   text: {
     color: '#000',
     fontSize: 15,
@@ -532,4 +567,4 @@ const style = StyleSheet.create({
   },
 });
 
-export default ListPage;
+export default TaskDetailsPage;
